@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import PySide
+import PySide,os
 from PySide import QtGui,QtCore
 
 import configparser,sys,os
@@ -26,15 +26,76 @@ except AttributeError:
  
 
 
-class Ui_RecipeCard(QtGui.QWidget):  
+class Ui_RecipeCard(QtGui.QWidget): 
     savefile = 'GenericRecipe.ini'
-    def saveRecipe(self):
-        dir = os.getcwd()
-        if not str(dir).endswith("Recipes"):
+    dir = os.path.expanduser("~")
+            #dir = os.getcwd()
+    if not str(dir).endswith("CookBook"):
+        try:
+            os.chdir("CookBook")
+            os.chdir("Recipes")
+        except:
+            #os.chdir(os.pardir)
             try:
+                os.mkdir("Recipes")
+            except:
+                pass
+            os.chdir("Recipes")    
+    try:
+                os.mkdir('Appitizers')
+                os.mkdir('Breads')
+                os.mkdir('Cake')
+                os.mkdir('Candy')
+                os.mkdir('Cookies')
+                os.mkdir('Desserts')
+                os.mkdir('Fish & SeaFood')
+                os.mkdir('Meat')
+                os.mkdir('Misc')
+                os.mkdir('Pies')
+                os.mkdir('Soups & Stews')
+                os.mkdir('Vegetables')
+    except:
+        pass     
+    def list_files(dir):
+        r = []
+        subdirs = [x[0] for x in os.walk(dir)]
+        print(subdirs)
+        for subdir in subdirs:                                                                                            
+            files = os.walk(subdir).next()[2]                                                                             
+            if (len(files) > 0):                                                                                          
+                for file in files:                                                                                        
+                    r.append(subdir + "/" + file)                                                                         
+        return r 
+    
+    
+    def saveRecipe(self):
+        dir = os.path.expanduser("~")
+        #dir = os.getcwd()
+        if not str(dir).endswith("CookBook"):
+            try:
+                os.chdir("CookBook")
                 os.chdir("Recipes")
             except:
-                os.chdir(os.pardir)        
+                #os.chdir(os.pardir)
+                try:
+                    os.mkdir("Recipes")
+                except:
+                    pass
+                os.chdir("Recipes")
+        
+                
+            
+        #AllItems = [self.comboBox.itemText(i) for i in range(self.comboBox.count())]
+        '''
+        for i in range(self.comboBox.count()):
+            txt = self.comboBox.itemText(i)
+            try:
+                os.mkdir(txt)
+            except:
+                pass
+        '''
+
+        print("CWD: "+os.getcwd())
         print("SaveButton Pressed :D")
         if not self.lineEdit.text() == None:
             self.savefile = self.lineEdit.text()+'.ini'
@@ -42,10 +103,10 @@ class Ui_RecipeCard(QtGui.QWidget):
         conf.set("Recipe","Name",self.lineEdit.text())
         conf.set("Recipe","Requirements", self.textEdit.toPlainText())
         conf.set("Recipe","Directions",self.textEdit_2.toPlainText())
-        os.chdir( self.comboBox.currentText() )
+        os.chdir(str(self.comboBox.currentText() ))
         Recipe = open(self.savefile,'w')
         conf.write(Recipe)
-       # savefile.close()
+        
         Recipe.close()
         os.chdir(os.pardir)
         msg = QtGui.QMessageBox(self)
@@ -58,8 +119,9 @@ class Ui_RecipeCard(QtGui.QWidget):
         reply = QtGui.QMessageBox.question(self, 'Message', 
                          quit_msg, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
     
-        if reply == QtGui.QMessageBox.Yes:    
-            quit()
+        if reply == QtGui.QMessageBox.Yes:
+            import sys    
+            sys.exit()
             #app.quit()
         else:
             pass
@@ -70,6 +132,17 @@ class Ui_RecipeCard(QtGui.QWidget):
        self.setupUi(self)
        '''
     def setupUi(self, RecipeCard):
+        
+        dir = os.getcwd()
+        if not str(dir).endswith("Recipes"):
+            try:
+                os.chdir("Recipes")
+            except:
+                #os.chdir(os.pardir)
+                os.mkdir("Recipes")
+                os.chdir("Recipes")
+                        
+                  
        # RecipeCard.setObjectName(_fromUtf8("RecipeCard"))
         RecipeCard.resize(640, 776)
        
@@ -91,7 +164,7 @@ class Ui_RecipeCard(QtGui.QWidget):
         #self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.comboBox = QtGui.QComboBox(RecipeCard)
         #self.comboBox.setObjectName(_fromUtf8("comboBox"))
-        
+        '''
         self.comboBox.addItem(_fromUtf8(""))
         self.comboBox.addItem(_fromUtf8(""))
         self.comboBox.addItem(_fromUtf8(""))
@@ -104,13 +177,13 @@ class Ui_RecipeCard(QtGui.QWidget):
         self.comboBox.addItem(_fromUtf8(""))
         self.comboBox.addItem(_fromUtf8(""))
         self.comboBox.addItem(_fromUtf8(""))
-   
+        '''
         self.verticalLayout.addWidget(self.comboBox)
     
         self.label = QtGui.QLabel(RecipeCard)
         #Here We Attempt To Allow User To Make New Catagories...
         self.newCat = QtGui.QPushButton("New Cataogry!?") 
-        #self.verticalLayout.addWidget(self.newCat) 
+        self.verticalLayout.addWidget(self.newCat) 
         
         
         #self.label.setObjectName(_fromUtf8("label"))
@@ -141,28 +214,29 @@ class Ui_RecipeCard(QtGui.QWidget):
          #self.pushButton.setText(_translate("RecipeCard", "Save Recipe!", None))
         self.verticalLayout_2.addWidget(self.pushButton)
        
-        """
-        <:Testing Zone:>
-        """
-        #
         self.connect(self.pushButton,QtCore.SIGNAL("clicked()"),self.saveRecipe)
         self.connect(self.newCat,QtCore.SIGNAL("clicked()"),self.createCat)
         #self.pushButton.connect(self.pushButton, QtCore.SIGNAL('clicked()'), self.saveRecipe(self.savefile))                
           
-        #
-        """
-        <:Testing Zone:>
-        """
+          
+      
+        subdirs = [x[0] for x in os.walk(os.getcwd())] 
+        for folder in subdirs:
+            self.comboBox.addItem(folder)
+       
         self.retranslateUi(RecipeCard)
         QtCore.QMetaObject.connectSlotsByName(RecipeCard)
+        
+       
     def createCat(self):
         dir = os.getcwd()
         if not str(dir).endswith("Recipes"):
             try:
                 os.chdir("Recipes")
             except:
-                os.chdir(os.pardir)
-                
+                #os.chdir(os.pardir)
+                os.mkdir("Recipes")
+                os.chdir("Recipes")
                 
         try:
             print("NewCat?")
@@ -190,6 +264,8 @@ class Ui_RecipeCard(QtGui.QWidget):
     def retranslateUi(self, RecipeCard):
             RecipeCard.setWindowTitle("CookBook - RecipeCard")
             #RecipeCard.setWindowTitle(_translate("RecipeCard", "PyCookBook - RecipeCard", None))
+            
+            '''
             self.comboBox.setItemText(0, _translate("RecipeCard", "Appitizers", None))
             self.comboBox.setItemText(1, _translate("RecipeCard", "Breads", None))
             self.comboBox.setItemText(2, _translate("RecipeCard", "Cake", None))
@@ -200,8 +276,9 @@ class Ui_RecipeCard(QtGui.QWidget):
             self.comboBox.setItemText(7, _translate("RecipeCard", "Meat", None))
             self.comboBox.setItemText(8, _translate("RecipeCard", "Misc", None))
             self.comboBox.setItemText(9, _translate("RecipeCard", "Pies", None))
-            self.comboBox.setItemText(10, _translate("RecipeCard", "Soups And Stews", None))
+            self.comboBox.setItemText(10, _translate("RecipeCard", "Soups & Stews", None))
             self.comboBox.setItemText(11, _translate("RecipeCard", "Vegetables", None))
+            '''
             self.label.setText(_translate("RecipeCard", "Recipe Name:", None))
             self.label_2.setText(_translate("RecipeCard", "Ingredients:", None))
             self.textEdit.setHtml(_translate("RecipeCard", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"

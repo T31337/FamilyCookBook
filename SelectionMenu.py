@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#This File Was Created With A LIttle Help From QtDesigner4
+#This File Was Created With A Little Help From QtDesigner4
 
-import PySide
+import PySide,PIL
 import PySide.QtCore as QtCore
 import PySide.QtGui as QtGui
 from PySide.QtGui import *
@@ -11,9 +11,9 @@ from PySide.QtCore import *
 from PIL import Image
 import configparser,os
 import RecipeCard
-
-
-dir = "."
+#from pydrive.auth import GoogleAuth
+#from pydrive.drive import GoogleDrive
+dir = os.chdir(os.pardir)
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -29,27 +29,30 @@ except AttributeError:
         return QtGui.QApplication.translate(context, text, disambig)
 
 class SelectionMenu(QtGui.QWidget):
-
+    
     conf = configparser.ConfigParser()
 
     def __init__(self):
         QtGui.QWidget.__init__(self)
         self.setupUi(self) 
+        
     def setupUi(self, Form):
+        dir = os.getcwd()
         Form.setObjectName(_fromUtf8("Form"))
         Form.resize(381, 254)
         self.verticalLayout_3 = QtGui.QVBoxLayout(Form)
+        
         self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
         self.verticalLayout_2 = QtGui.QVBoxLayout()
         self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.verticalLayout = QtGui.QVBoxLayout()
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         #
+        print('current dir: '+str(dir))
         self.img = QtGui.QLabel(Form)
         self.img.setPixmap('Logo.png')
         self.verticalLayout.addWidget(self.img)
         self.img.show()
-        
         #
         #
         '''
@@ -83,14 +86,17 @@ class SelectionMenu(QtGui.QWidget):
         
     def openFile(self):
         print("OpenFile Pressed!")
-        dir  =  os.getcwd()
-        print("CWD: "+os.getcwd())
+        #dir  =  os.path.expanduser("~")
+        dir = os.getcwd()
+        
         if not str(dir).endswith("Recipes"):
             try:
                 os.chdir("Recipes")
             except:
-                os.chdir(os.pardir)
-        print("New CWD: "+os.getcwd())
+                #os.chdir(os.pardir)
+                os.mkdir("Recipes")
+                os.chdir("Recipes")
+
         #dir = os.chdir("Recipes")
         self.file = QtGui.QFileDialog.getOpenFileName(self,"CookBook - Open Recipe",filter="Recipe Files(*.ini)")
       
@@ -99,7 +105,7 @@ class SelectionMenu(QtGui.QWidget):
             pass
         else:
             print("Opening File....")
-           # self.file = self.win.fileSelected
+           #self.file = self.win.fileSelected
             self.conf.read(self.file)
             print("Recipe File Has Been Read Into self.conf")
             self.Recipe=QtGui.QWidget()
@@ -117,12 +123,15 @@ class SelectionMenu(QtGui.QWidget):
 
     def newRecipe(self):
         dir = os.getcwd()
+        #dir = os.path.expanduser("~")
         if not str(dir).endswith("Recipes"):
             try:
                 os.chdir("Recipes")
             except:
                 os.chdir(os.pardir)   
-                
+                #os.mkdir("Recipes")
+                #os.chdir("Recipes")
+            
         print("NewRecipe Button Pressed!")
         self.Recipe = QtGui.QWidget()
         self.Card = RecipeCard.Ui_RecipeCard()
@@ -132,12 +141,11 @@ class SelectionMenu(QtGui.QWidget):
 
     def CloseRecipe(self):
         #This Has Been Challengeing, Not Too Important, May Add In Future...
-        pass
+        self.destroy()
     
         
 if __name__ == "__main__":
     import sys
-    dir = "."
     app = QtGui.QApplication(sys.argv)
     Form = QtGui.QWidget()
     ui = SelectionMenu()
