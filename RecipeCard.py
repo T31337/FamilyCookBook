@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import PySide,os
+import PySide,os,time
 from PySide import QtGui,QtCore
 
 import configparser,sys,os
@@ -94,7 +94,7 @@ class Ui_RecipeCard(QtGui.QWidget):
             except:
                 pass
         '''
-
+        self.pic = None
         print("CWD: "+os.getcwd())
         print("SaveButton Pressed :D")
         if not self.lineEdit.text() == None:
@@ -103,21 +103,25 @@ class Ui_RecipeCard(QtGui.QWidget):
         conf.set("Recipe","Name",self.lineEdit.text())
         conf.set("Recipe","Requirements", self.textEdit.toPlainText())
         conf.set("Recipe","Directions",self.textEdit_2.toPlainText())
+        conf.set("Recipe","Picture",'')
         os.chdir(str(self.comboBox.currentText() ))
         Recipe = open(self.savefile,'w')
         conf.write(Recipe)
         
         Recipe.close()
         os.chdir(os.pardir)
-        msg = QtGui.QMessageBox(self)
         
+        msg = QtGui.QMessageBox(self)    
         msg.setWindowTitle("CookBook")
-        msg.setText("Save Sucessful! - Close CookBook?")
-        msg.NoRole=msg.addButton(QtGui.QMessageBox.NoButton)
         
+        msg.NoRole=msg.addButton(QtGui.QMessageBox.NoButton)
         quit_msg = "Save Sucessful!\nClose CookBook?"
-        reply = QtGui.QMessageBox.question(self, 'Message', 
-                         quit_msg, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+
+        #ToDo: Make This A User Configuration Option
+        
+        '''
+        msg.setText("Save Sucessful! - Close CookBook?")
+        reply = QtGui.QMessageBox.question(self, 'Message', quit_msg, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
     
         if reply == QtGui.QMessageBox.Yes:
             import sys    
@@ -125,7 +129,9 @@ class Ui_RecipeCard(QtGui.QWidget):
             #app.quit()
         else:
             pass
- 
+        '''
+    #   
+    #       
         '''
    def __init__(self):
        QWidget.__init__(self)
@@ -160,7 +166,7 @@ class Ui_RecipeCard(QtGui.QWidget):
         '''
         #
         #
-               
+                
         #self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.comboBox = QtGui.QComboBox(RecipeCard)
         #self.comboBox.setObjectName(_fromUtf8("comboBox"))
@@ -179,22 +185,31 @@ class Ui_RecipeCard(QtGui.QWidget):
         self.comboBox.addItem(_fromUtf8(""))
         '''
         self.verticalLayout.addWidget(self.comboBox)
-    
-        self.label = QtGui.QLabel(RecipeCard)
-        #Here We Attempt To Allow User To Make New Catagories...
         self.newCat = QtGui.QPushButton("New Cataogry!?") 
-        self.verticalLayout.addWidget(self.newCat) 
-        
-        
+        self.verticalLayout.addWidget(self.newCat)     
+        self.label = QtGui.QLabel(RecipeCard)
+
         #self.label.setObjectName(_fromUtf8("label"))
         self.verticalLayout.addWidget(self.label)
-        
-   
         #
-        
         self.lineEdit = QtGui.QLineEdit(RecipeCard)
         #self.lineEdit.setObjectName(_fromUtf8("lineEdit"))
         self.verticalLayout.addWidget(self.lineEdit)
+        
+        
+        #Picture#
+        #Note: This Needs To Be Dynamic Based On Recipe Name
+        
+        self.pic = QtGui.QLabel()
+        self.verticalLayout.addWidget(self.pic)        
+              
+        try:
+            self.pic.setPixmap('food.jpg')
+        except:
+            self.pic.setPixmap('food.png')
+        #End Picture#
+        
+        
         self.verticalLayout_2.addLayout(self.verticalLayout)
         self.label_2 = QtGui.QLabel(RecipeCard)
         #self.label_2.setObjectName(_fromUtf8("label_2"))
