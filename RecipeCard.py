@@ -28,19 +28,19 @@ except AttributeError:
 
 class Ui_RecipeCard(QtGui.QWidget): 
     savefile = 'GenericRecipe.ini'
-    dir = os.path.expanduser("~")
-            #dir = os.getcwd()
-    if not str(dir).endswith("CookBook"):
+    #dir = os.path.expanduser("~")
+    dir = os.getcwd()
+    #if not str(dir).endswith("CookBook"):
+    try:
+        #os.chdir("CookBook")
+        os.chdir("Recipes")
+    except:
+        #os.chdir(os.pardir)
         try:
-            os.chdir("CookBook")
-            os.chdir("Recipes")
+            os.mkdir("Recipes")
         except:
-            #os.chdir(os.pardir)
-            try:
-                os.mkdir("Recipes")
-            except:
-                pass
-            os.chdir("Recipes")    
+            pass
+        os.chdir("Recipes")    
     try:
                 os.mkdir('Appitizers')
                 os.mkdir('Breads')
